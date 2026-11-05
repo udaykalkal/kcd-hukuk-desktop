@@ -563,13 +563,15 @@ fn build_menu<R: Runtime>(app: &AppHandle<R>) -> tauri::Result<()> {
     use tauri::menu::{MenuBuilder, MenuItemBuilder, SubmenuBuilder};
     let check = MenuItemBuilder::with_id("check_update", "Güncellemeleri denetle…").build(app)?;
     let reload = MenuItemBuilder::with_id("reload", "Yenile").accelerator("CmdOrCtrl+R").build(app)?;
-    let browser = MenuItemBuilder::with_id("open_browser", "Tarayıcıda aç").build(app)?;
+    let logout = MenuItemBuilder::with_id("logout", "Çıkış yap (Claude hesabını değiştir)").build(app)?;
     let home = MenuItemBuilder::with_id("home", "KCD Hukuk'a dön").accelerator("CmdOrCtrl+Shift+H").build(app)?;
     let report = MenuItemBuilder::with_id("report", "Tanılama raporu oluştur").build(app)?;
     let app_menu = SubmenuBuilder::new(app, "KCD Hukuk")
         .about(None)
         .separator()
         .item(&check)
+        .separator()
+        .item(&logout)
         .separator()
         .services()
         .separator()
@@ -591,7 +593,6 @@ fn build_menu<R: Runtime>(app: &AppHandle<R>) -> tauri::Result<()> {
     let view = SubmenuBuilder::new(app, "Görünüm")
         .item(&reload)
         .item(&home)
-        .item(&browser)
         .separator()
         .item(&report)
         .separator()
@@ -619,14 +620,15 @@ fn build_menu<R: Runtime>(app: &AppHandle<R>) -> tauri::Result<()> {
                 let _ = w.eval("location.reload()");
             }
         }
-        "open_browser" => {
-            let url = app
-                .get_webview_window(MAIN)
-                .and_then(|w| w.url().ok())
-                .map(|u| u.to_string())
-                .filter(|u| u.starts_with("https://"))
-                .unwrap_or_else(|| app_url(&app.state::<AppState>()));
-            open_outside(app, &url);
+        "logout" => {
+            // Sign out: forget this window's Claude sign-in (cookies, storage) and show
+            // Claude's login page; after signing in, the guard opens KCD Hukuk again.
+            if let Some(w) = app.get_webview_window(MAIN) {
+                let _ = w.clear_all_browsing_data();
+                if let Ok(u) = url::Url::parse("https://claude.ai/login") {
+                    let _ = w.navigate(u);
+                }
+            }
         }
         "check_update" => {
             let handle = app.clone();

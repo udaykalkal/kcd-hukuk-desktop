@@ -41,7 +41,6 @@
   <div class="actions" id="actions" hidden>
     <button class="primary" id="retry" type="button">Tekrar dene</button>
     <button class="ghost" id="anyway" type="button">Yine de aç</button>
-    <button class="ghost" id="browser" type="button">Tarayıcıda aç</button>
   </div>
   <p class="detail" id="detail" hidden></p>
 </main>
@@ -103,9 +102,6 @@
     $('retry').addEventListener('click', go);
     $('anyway').addEventListener('click', function () { cfgThenOpen(); });
     function cfgThenOpen() { invoke('kcd_config').then(function (c) { if (c && c.url) url = c.url; }, function () { }).then(open); }
-    $('browser').addEventListener('click', function () {
-      invoke('kcd_open_external', { url: url }).catch(function () { location.href = url; });
-    });
     window.addEventListener('online', go);
     go();
   })();
