@@ -1,0 +1,14 @@
+{
+  "name": "kcd-hukuk-desktop",
+  "private": true,
+  "version": "3.0.0",
+  "description": "KCD Hukuk desktop app for Mac and Windows: a light window that opens the KCD Hukuk Claude artifact and updates itself.",
+  "scripts": {
+    "tauri": "tauri",
+    "build": "tauri build",
+    "test:bridge": "node tests/bridge.test.js"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "2.12.2"
+  }
+}

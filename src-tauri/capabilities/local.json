@@ -1,0 +1,13 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "local",
+  "description": "The bundled start page: reads the shell settings and opens kcdAI.",
+  "windows": ["main"],
+  "permissions": [
+    "core:default",
+    "allow-kcd-config",
+    "allow-kcd-open-external",
+    "allow-kcd-online"
+  ]
+}
+

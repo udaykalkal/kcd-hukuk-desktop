@@ -1,0 +1,21 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "remote",
+  "description": "The kcdAI build on claude.ai: the few desktop functions it may use.",
+  "windows": ["main"],
+  "remote": {
+    "urls": ["https://claude.ai/*", "https://*.claude.ai/*"]
+  },
+  "permissions": [
+    "allow-kcd-config",
+    "allow-kcd-set-config",
+    "allow-kcd-notify",
+    "allow-kcd-open-external",
+    "allow-kcd-save-file",
+    "allow-kcd-show-file",
+    "allow-kcd-check-update",
+    "allow-kcd-restart",
+    "allow-kcd-badge"
+  ]
+}
+

@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KCD Hukuk</title>
+<style>
+  :root { color-scheme: light dark; --navy: #0B1426; --navy2: #1B2B4B; --gold: #E6B865; --ink: #F5F5F7; --muted: #A9B3C7; }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    display: grid; place-items: center;
+    background: radial-gradient(120% 90% at 30% 10%, #2C4675 0%, var(--navy2) 40%, var(--navy) 100%);
+    color: var(--ink);
+    font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased; user-select: none; cursor: default;
+  }
+  main { display: grid; justify-items: center; gap: 18px; padding: 24px; text-align: center; max-width: 440px; }
+  .mark { display: flex; align-items: baseline; gap: 8px; }
+  .mark b { font: 600 64px/1 "New York", "Iowan Old Style", Georgia, "Times New Roman", serif; letter-spacing: -0.02em; }
+  .mark span { font: 700 13px/1 -apple-system, "Segoe UI", sans-serif; letter-spacing: .14em; color: var(--gold); padding: 5px 7px 4px; border-radius: 6px; background: rgba(230,184,101,.14); transform: translateY(-14px); }
+  .rule { width: 120px; height: 2px; background: linear-gradient(90deg, transparent, var(--gold), transparent); opacity: .8; }
+  #msg { margin: 0; color: var(--muted); min-height: 1.5em; }
+  .spin { width: 22px; height: 22px; border-radius: 50%; border: 2px solid rgba(255,255,255,.18); border-top-color: var(--gold); animation: s .9s linear infinite; }
+  @keyframes s { to { transform: rotate(360deg); } }
+  .actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+  button { font: inherit; font-weight: 600; border: 0; border-radius: 999px; padding: 9px 18px; cursor: pointer; }
+  .primary { background: var(--gold); color: var(--navy); }
+  .ghost { background: rgba(255,255,255,.1); color: var(--ink); }
+  [hidden] { display: none !important; }
+  .detail { margin: 0; font-size: 12px; color: rgba(255,255,255,.4); user-select: text; }
+  .ver { position: fixed; bottom: 14px; left: 0; right: 0; text-align: center; font-size: 12px; color: rgba(255,255,255,.35); }
+</style>
+</head>
+<body>
+<main>
+  <div class="mark" aria-label="KCD Hukuk"><b>kcd</b><span> Hukuk</span></div>
+  <div class="rule" aria-hidden="true"></div>
+  <div class="spin" id="spin" aria-hidden="true"></div>
+  <p id="msg" role="status">KCD Hukuk açılıyor…</p>
+  <div class="actions" id="actions" hidden>
+    <button class="primary" id="retry" type="button">Tekrar dene</button>
+    <button class="ghost" id="anyway" type="button">Yine de aç</button>
+    <button class="ghost" id="browser" type="button">Tarayıcıda aç</button>
+  </div>
+  <p class="detail" id="detail" hidden></p>
+</main>
+<div class="ver" id="ver"></div>
+<script>
+  (function () {
+    var FALLBACK = 'https://claude.ai/artifact/TGniJ3KNVgcHiBJMH5Hkmw';
+    var url = FALLBACK;
+    var busy = false;
+    var $ = function (id) { return document.getElementById(id); };
+    function invoke(cmd, args) {
+      var t = window.__TAURI_INTERNALS__;
+      return t && t.invoke ? t.invoke(cmd, args || {}) : Promise.reject(new Error('köprü yok'));
+    }
+    function state(text, failed, detail) {
+      $('msg').textContent = text;
+      $('spin').hidden = !!failed;
+      $('actions').hidden = !failed;
+      $('detail').hidden = !detail;
+      $('detail').textContent = detail || '';
+    }
+    function wait(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+    /* The app checks natively (DNS + TCP to claude.ai:443); the page also tries a request.
+       Either one succeeding is enough. The page request goes to a public CDN file: claude.ai
+       answers with Cross-Origin-Resource-Policy: same-origin, so a web view can never read it. */
+    function nativeCheck() {
+      return invoke('kcd_online').then(function (r) { return { ok: !!(r && r.ok), why: r && r.reason ? 'uygulama: ' + r.reason : '' }; },
+        function (e) { return { ok: false, why: 'uygulama: ' + (e && e.message || e) }; });
+    }
+    function pageCheck() {
+      return new Promise(function (resolve) {
+        var done = false;
+        var finish = function (v) { if (!done) { done = true; resolve(v); } };
+        setTimeout(function () { finish({ ok: false, why: 'sayfa: zaman aşımı' }); }, 9000);
+        fetch('https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js', { method: 'HEAD', cache: 'no-store' })
+          .then(function () { finish({ ok: true }); }, function (e) { finish({ ok: false, why: 'sayfa: ' + (e && e.message || e) }); });
+      });
+    }
+    function open() { state('KCD Hukuk açılıyor…', false); location.replace(url); }
+    function go() {
+      if (busy) return; busy = true;
+      state('KCD Hukuk açılıyor…', false);
+      var cfg = invoke('kcd_config').then(function (c) {
+        if (c && c.url) url = c.url;
+        if (c && c.version) $('ver').textContent = 'KCD Hukuk ' + c.version;
+      }, function () { });
+      var results = [];
+      var won = false;
+      var checks = [nativeCheck(), pageCheck()].map(function (p) {
+        return p.then(function (r) { results.push(r); if (r.ok && !won) { won = true; cfg.then(open); } return r; });
+      });
+      Promise.all([Promise.all(checks), wait(700)]).then(function () {
+        busy = false;
+        if (won) return;
+        state('claude.ai\'ya ulaşılamadı. İnternet bağlantınızı kontrol edin; bağlantınız varsa “Yine de aç”a basın.', true,
+          results.map(function (r) { return r.why; }).filter(Boolean).join(' · '));
+      });
+    }
+    $('retry').addEventListener('click', go);
+    $('anyway').addEventListener('click', function () { cfgThenOpen(); });
+    function cfgThenOpen() { invoke('kcd_config').then(function (c) { if (c && c.url) url = c.url; }, function () { }).then(open); }
+    $('browser').addEventListener('click', function () {
+      invoke('kcd_open_external', { url: url }).catch(function () { location.href = url; });
+    });
+    window.addEventListener('online', go);
+    go();
+  })();
+</script>
+</body>
+</html>
+
