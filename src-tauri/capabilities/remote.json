@@ -15,7 +15,8 @@
     "allow-kcd-show-file",
     "allow-kcd-check-update",
     "allow-kcd-restart",
-    "allow-kcd-badge"
+    "allow-kcd-badge",
+    "allow-kcd-logout"
   ]
 }
 

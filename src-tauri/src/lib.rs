@@ -620,16 +620,7 @@ fn build_menu<R: Runtime>(app: &AppHandle<R>) -> tauri::Result<()> {
                 let _ = w.eval("location.reload()");
             }
         }
-        "logout" => {
-            // Sign out: forget this window's Claude sign-in (cookies, storage) and show
-            // Claude's login page; after signing in, the guard opens KCD Hukuk again.
-            if let Some(w) = app.get_webview_window(MAIN) {
-                let _ = w.clear_all_browsing_data();
-                if let Ok(u) = url::Url::parse("https://claude.ai/login") {
-                    let _ = w.navigate(u);
-                }
-            }
-        }
+        "logout" => sign_out(app),
         "check_update" => {
             let handle = app.clone();
             tauri::async_runtime::spawn(async move { check_and_stage(handle).await });
@@ -637,6 +628,22 @@ fn build_menu<R: Runtime>(app: &AppHandle<R>) -> tauri::Result<()> {
         _ => {}
     });
     Ok(())
+}
+
+/// Sign out: forget this window's Claude sign-in (cookies, storage) and show Claude's login
+/// page; after signing in, the guard opens KCD Hukuk again.
+fn sign_out<R: Runtime>(app: &AppHandle<R>) {
+    if let Some(w) = app.get_webview_window(MAIN) {
+        let _ = w.clear_all_browsing_data();
+        if let Ok(u) = url::Url::parse("https://claude.ai/login") {
+            let _ = w.navigate(u);
+        }
+    }
+}
+
+#[tauri::command]
+fn kcd_logout<R: Runtime>(app: AppHandle<R>) {
+    sign_out(&app);
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -663,6 +670,7 @@ pub fn run() {
             kcd_show_file,
             kcd_check_update,
             kcd_restart,
+            kcd_logout,
             kcd_badge,
             kcd_online
         ])

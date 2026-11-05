@@ -11,6 +11,7 @@ fn main() {
             "kcd_restart",
             "kcd_badge",
             "kcd_online",
+            "kcd_logout",
         ]),
     ))
     .expect("failed to run tauri-build");

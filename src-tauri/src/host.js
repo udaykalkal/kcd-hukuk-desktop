@@ -307,7 +307,7 @@
       checkUpdate: function () { return ipc('kcd_check_update'); },
       restart: function () { return ipc('kcd_restart'); },
       badge: function (a) { return ipc('kcd_badge', { count: Math.max(0, (a && a.count) | 0) }); },
-      openInBrowser: function () { return ipc('kcd_open_external', { url: location.href }); }
+      logout: function () { return ipc('kcd_logout'); }
     };
 
     window.addEventListener('message', function (ev) {
@@ -453,7 +453,7 @@
       info: function () { return call('info'); },
       notify: function (title, body) { return call('notify', { title: title, body: body }); },
       openExternal: function (url) { return call('openExternal', { url: url }); },
-      openInBrowser: function () { return call('openInBrowser'); },
+      logout: function () { return call('logout'); },
       saveFile: function (name, base64) { return call('saveFile', { name: name, data: base64 }); },
       showFile: function (path) { return call('showFile', { path: path }); },
       checkUpdate: function () { return call('checkUpdate'); },
