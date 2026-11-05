@@ -4,7 +4,7 @@ KCD Hukuk bir Claude uygulamasıdır (artifact). Masaüstü uygulaması yalnızc
 
 ## Web
 
-Herhangi bir tarayıcıdan: **[KCD Hukuk](https://claude.ai/artifact/TGniJ3KNVgcHiBJMH5Hkmw)** — uygulamanın sahibi olan Claude hesabıyla giriş yapın.
+Herhangi bir tarayıcıdan: **[KCD Hukuk](https://claude.ai/artifact/NVbQeseTENp9AaaCnCCdor)** — uygulamanın sahibi olan Claude hesabıyla giriş yapın.
 
 ## Mac
 
