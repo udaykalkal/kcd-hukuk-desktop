@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-kcd-config"
+description = "Enables the kcd_config command without any pre-configured scope."
+commands.allow = ["kcd_config"]
+
+[[permission]]
+identifier = "deny-kcd-config"
+description = "Denies the kcd_config command without any pre-configured scope."
+commands.deny = ["kcd_config"]

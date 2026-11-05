@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-kcd-check-update"
+description = "Enables the kcd_check_update command without any pre-configured scope."
+commands.allow = ["kcd_check_update"]
+
+[[permission]]
+identifier = "deny-kcd-check-update"
+description = "Denies the kcd_check_update command without any pre-configured scope."
+commands.deny = ["kcd_check_update"]

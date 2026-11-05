@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-kcd-online"
+description = "Enables the kcd_online command without any pre-configured scope."
+commands.allow = ["kcd_online"]
+
+[[permission]]
+identifier = "deny-kcd-online"
+description = "Denies the kcd_online command without any pre-configured scope."
+commands.deny = ["kcd_online"]

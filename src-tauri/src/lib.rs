@@ -442,8 +442,9 @@ fn kcd_badge<R: Runtime>(app: AppHandle<R>, count: i64) {
 
 /* ------------------------------------------------------------------ window */
 
-fn host_script() -> String {
+fn host_script(app_url: &str) -> String {
     HOST_JS
+        .replace("__KCD_APP_URL__", &app_url.replace('\\', "").replace('\'', ""))
         .replace("__KCD_VERSION__", env!("CARGO_PKG_VERSION"))
         .replace("__KCD_PLATFORM__", platform())
 }
@@ -455,6 +456,7 @@ fn build_main_window<R: Runtime>(app: &AppHandle<R>) -> tauri::Result<()> {
     let popup_ua = safari_ua();
     let dl_app = app.clone();
 
+    let start_url = app_url(&app.state::<AppState>());
     let builder = WebviewWindowBuilder::new(app, MAIN, WebviewUrl::App("index.html".into()));
     // Present the Mac window as Safari: Google sign-in refuses web views whose user agent
     // lacks the Safari token ("This browser or app may not be secure").
@@ -467,7 +469,7 @@ fn build_main_window<R: Runtime>(app: &AppHandle<R>) -> tauri::Result<()> {
         .inner_size(1320.0, 860.0)
         .min_inner_size(900.0, 600.0)
         .center()
-        .initialization_script_for_all_frames(host_script())
+        .initialization_script_for_all_frames(host_script(&start_url))
         .zoom_hotkeys_enabled(true)
         .on_navigation(move |url| {
             if stays_inside(url) {

@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-kcd-show-file"
+description = "Enables the kcd_show_file command without any pre-configured scope."
+commands.allow = ["kcd_show_file"]
+
+[[permission]]
+identifier = "deny-kcd-show-file"
+description = "Denies the kcd_show_file command without any pre-configured scope."
+commands.deny = ["kcd_show_file"]

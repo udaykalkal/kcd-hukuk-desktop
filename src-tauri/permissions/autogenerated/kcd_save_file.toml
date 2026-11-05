@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-kcd-save-file"
+description = "Enables the kcd_save_file command without any pre-configured scope."
+commands.allow = ["kcd_save_file"]
+
+[[permission]]
+identifier = "deny-kcd-save-file"
+description = "Denies the kcd_save_file command without any pre-configured scope."
+commands.deny = ["kcd_save_file"]

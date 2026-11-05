@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-kcd-notify"
+description = "Enables the kcd_notify command without any pre-configured scope."
+commands.allow = ["kcd_notify"]
+
+[[permission]]
+identifier = "deny-kcd-notify"
+description = "Denies the kcd_notify command without any pre-configured scope."
+commands.deny = ["kcd_notify"]

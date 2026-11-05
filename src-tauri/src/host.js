@@ -21,7 +21,30 @@
     if (!/(^|\.)claude\.(ai|com)$/i.test(host)) return; // splash page, login providers: nothing to do
     if (window.__kcdShellTop) return;
     window.__kcdShellTop = true;
-    topFrame();
+    /* Stay on the KCD Hukuk app: any other claude.ai page (chat, home, projects, the page
+       Claude opens after sign-in, the artifact page's close button) sends the window back.
+       Sign-in, verification and Claude's own API/checks are left alone. Claude switches pages
+       without reloading, so the address is checked continuously. */
+    var APP_URL = '__KCD_APP_URL__';
+    var ALLOWED = /^\/(artifact\/|login|logout|magic-link|verify|auth|oauth|sso|api\/|cdn-cgi\/|onboarding|invite|accept-invite|legal|download)/i;
+    var leaving = false;
+    function guard() {
+      if (leaving) return;
+      var p = String(location.pathname || '/');
+      if (ALLOWED.test(p)) return;
+      leaving = true;
+      try { location.replace(APP_URL); } catch (e) { location.href = APP_URL; }
+    }
+    guard();
+    if (!leaving) {
+      ['pushState', 'replaceState'].forEach(function (k) {
+        var orig = history[k];
+        if (typeof orig === 'function') history[k] = function () { var r = orig.apply(this, arguments); setTimeout(guard, 0); return r; };
+      });
+      window.addEventListener('popstate', function () { setTimeout(guard, 0); });
+      setInterval(guard, 1000);
+      topFrame();
+    }
   } else if (/(^|\.)(claude\.ai|claude\.com|claudeusercontent\.com|claudemcpcontent\.com)$/i.test(String(location.hostname || ''))) {
     subFrame(); // only Claude's own frames, where the kcdAI build runs; third-party frames
                 // (Cloudflare's browser check, payments, help widgets) are left untouched

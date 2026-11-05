@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-kcd-badge"
+description = "Enables the kcd_badge command without any pre-configured scope."
+commands.allow = ["kcd_badge"]
+
+[[permission]]
+identifier = "deny-kcd-badge"
+description = "Denies the kcd_badge command without any pre-configured scope."
+commands.deny = ["kcd_badge"]
