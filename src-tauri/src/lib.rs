@@ -471,6 +471,9 @@ fn build_main_window<R: Runtime>(app: &AppHandle<R>) -> tauri::Result<()> {
         .center()
         .initialization_script_for_all_frames(host_script(&start_url))
         .zoom_hotkeys_enabled(true)
+        // Let the page receive dragged files (Asistan and Dilekçe yaz drop zones); without this
+        // the native window swallows file drops and the web page never sees them.
+        .disable_drag_drop_handler()
         .on_navigation(move |url| {
             if stays_inside(url) {
                 true
