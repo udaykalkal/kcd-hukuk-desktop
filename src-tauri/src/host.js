@@ -114,6 +114,12 @@
     var revealed = false;    // Claude's full page shown on request
     var children = [];       // frames that said hello (for events)
 
+    /* Google/Apple/Microsoft sign-in finishing by messaging this window: close the leftover popup */
+    window.addEventListener('message', function (e) {
+      if (/^https:\/\/(accounts\.google\.com|appleid\.apple\.com|login\.microsoftonline\.com)$/.test(e.origin)) {
+        try { ipc('kcd_close_popups'); } catch (x) { }
+      }
+    });
     function ipc(cmd, args) {
       var t = window.__TAURI_INTERNALS__;
       if (!t || typeof t.invoke !== 'function') return Promise.reject(new Error('Masaüstü köprüsü hazır değil.'));

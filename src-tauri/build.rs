@@ -12,6 +12,7 @@ fn main() {
             "kcd_badge",
             "kcd_online",
             "kcd_logout",
+            "kcd_close_popups",
         ]),
     ))
     .expect("failed to run tauri-build");
