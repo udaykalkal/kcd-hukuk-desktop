@@ -15,6 +15,16 @@
   var MSG = 'kcd-shell';
   var isTop;
   try { isTop = window.top === window; } catch (e) { isTop = false; }
+  /* claude.ai labels the artifact frame "User-generated artifact content"; the browser shows that label as a tooltip
+     wherever the mouse rests. Inside the desktop window it is noise, so frame titles are removed in every frame. */
+  function untitle() {
+    try {
+      var els = document.querySelectorAll('iframe[title], [title="User-generated artifact content"]');
+      for (var i = 0; i < els.length; i++) els[i].removeAttribute('title');
+    } catch (e) { }
+  }
+  untitle();
+  setInterval(untitle, 1000);
 
   if (isTop) {
     var host = String(location.hostname || '');
