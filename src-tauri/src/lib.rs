@@ -141,6 +141,29 @@ fn safari_ua() -> String {
 #[cfg(target_os = "macos")]
 const POPUP_CLOSE_JS: &str = "(function(){try{var c=window.close.bind(window);window.close=function(){try{document.title='__kcd_close__';}catch(e){}try{c();}catch(e){}};}catch(e){}})();";
 
+/// Close every sign-in popup. Google's sign-in can finish by signalling the main window instead of
+/// calling window.close() in the popup; the popup then stayed open and blank.
+fn close_popups<R: Runtime>(app: &AppHandle<R>) {
+    for (label, w) in app.webview_windows() {
+        if label.starts_with("popup-") {
+            let _ = w.close();
+        }
+    }
+}
+
+#[tauri::command]
+fn kcd_close_popups<R: Runtime>(app: AppHandle<R>) {
+    let h = app.clone();
+    std::thread::spawn(move || {
+        std::thread::sleep(std::time::Duration::from_millis(1200));
+        close_popups(&h);
+    });
+}
+
+fn is_claude(url: &url::Url) -> bool {
+    url.host_str().map(|h| h == "claude.ai" || h.ends_with(".claude.ai")).unwrap_or(false)
+}
+
 fn open_outside<R: Runtime>(app: &AppHandle<R>, url: &str) {
     if let Ok(u) = url::Url::parse(url) {
         if matches!(u.scheme(), "http" | "https" | "mailto" | "tel") {
@@ -470,6 +493,11 @@ fn build_main_window<R: Runtime>(app: &AppHandle<R>) -> tauri::Result<()> {
         .min_inner_size(900.0, 600.0)
         .center()
         .initialization_script_for_all_frames(host_script(&start_url))
+        .on_page_load(|w, payload| {
+            if payload.event() == tauri::webview::PageLoadEvent::Finished && is_claude(payload.url()) {
+                close_popups(w.app_handle());
+            }
+        })
         .zoom_hotkeys_enabled(true)
         // Let the page receive dragged files (Asistan and Dilekçe yaz drop zones); without this
         // the native window swallows file drops and the web page never sees them.
@@ -499,6 +527,11 @@ fn build_main_window<R: Runtime>(app: &AppHandle<R>) -> tauri::Result<()> {
                     .title("KCD Hukuk")
                     .user_agent(&popup_ua)
                     .initialization_script_for_all_frames(POPUP_CLOSE_JS)
+                    .on_page_load(|w, payload| {
+                        if payload.event() == tauri::webview::PageLoadEvent::Finished && is_claude(payload.url()) {
+                            let _ = w.close();
+                        }
+                    })
                     .on_document_title_changed(|w, title| {
                         if title == "__kcd_close__" {
                             let _ = w.close();
@@ -675,7 +708,8 @@ pub fn run() {
             kcd_restart,
             kcd_logout,
             kcd_badge,
-            kcd_online
+            kcd_online,
+            kcd_close_popups
         ])
         .setup(|app| {
             let handle = app.handle().clone();
