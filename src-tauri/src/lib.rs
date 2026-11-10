@@ -25,7 +25,7 @@ use tauri_plugin_opener::OpenerExt;
 use tauri_plugin_updater::{Update, UpdaterExt};
 
 /// The kcdAI build. The build itself can move this (see `kcd_set_config`).
-const DEFAULT_URL: &str = "https://claude.ai/artifact/NVbQeseTENp9AaaCnCCdor";
+const DEFAULT_URL: &str = "https://claude.ai/artifact/NKSbiEBsh6vDE6yZ1BnNqd";
 const HOST_JS: &str = include_str!("host.js");
 const MAIN: &str = "main";
 const UPDATE_EVERY: Duration = Duration::from_secs(6 * 60 * 60);
