@@ -62,7 +62,7 @@ jobs:
           releaseBody: |
             KCD Hukuk masaüstü uygulaması.
             Mac: KCD-Hukuk-Mac.dmg · Windows: KCD-Hukuk-Windows.exe
-            Web: https://claude.ai/artifact/NKSbiEBsh6vDE6yZ1BnNqd
+            Web: https://claude.ai/artifact/RtpPJexjqUz8gtdwKiSr9B
             Yüklü uygulamalar bu sürümü kendiliğinden alır.
           releaseDraft: false
           prerelease: false
