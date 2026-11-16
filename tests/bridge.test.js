@@ -34,7 +34,7 @@ const TOP_HTML = `<!doctype html><html><head><title>Claude</title></head><body s
   </div>
 </body></html>`;
 
-const APP_HTML = `<!doctype html><html><body><h1>kcdAI</h1><script>
+const APP_HTML = `<!doctype html><html><body><h1>KCD Hukuk</h1><script>
   window.__events = [];
   window.__ready = new Promise(function (r) { setTimeout(r, 50); });
   if (window.kcdHost) window.kcdHost.on('update', function (d) { window.__events.push(d); });
@@ -51,7 +51,7 @@ const APP_HTML = `<!doctype html><html><body><h1>kcdAI</h1><script>
   await page.goto('https://claude.ai/artifact/test');
   await page.waitForTimeout(400);
 
-  // 1. Only the kcdAI frame shows, full window.
+  // 1. Only the KCD Hukuk frame shows, full window.
   const state = await page.evaluate(() => {
     const f = document.getElementById('art');
     const r = f.getBoundingClientRect();
@@ -71,7 +71,7 @@ const APP_HTML = `<!doctype html><html><body><h1>kcdAI</h1><script>
   assert.strictEqual(state.side, 'none', 'Claude sidebar hidden');
   assert.strictEqual(state.toolbar, 'none', 'viewer toolbar hidden');
 
-  // 2. kcdHost in the kcdAI frame, with the old contract and the new calls.
+  // 2. kcdHost in the KCD Hukuk frame, with the old contract and the new calls.
   const frame = page.frames().find((f) => f.url().startsWith('https://abc.claudeusercontent.com'));
   assert.ok(frame, 'app frame found');
   const host = await frame.evaluate(() => ({
@@ -83,7 +83,7 @@ const APP_HTML = `<!doctype html><html><body><h1>kcdAI</h1><script>
 
   const saved = await frame.evaluate(() => window.kcdHost.saveFile('dilekce.udf', 'UEsDBA=='));
   assert.strictEqual(saved, '/Users/test/Downloads/dilekce.udf');
-  await frame.evaluate(() => window.kcdHost.notify('kcdAI', 'Süre yarın doluyor'));
+  await frame.evaluate(() => window.kcdHost.notify('KCD Hukuk', 'Süre yarın doluyor'));
   const calls = await page.evaluate(() => window.__calls.map((c) => c.cmd));
   assert.ok(calls.includes('kcd_save_file') && calls.includes('kcd_notify'), 'native calls forwarded: ' + calls.join(','));
 
@@ -93,7 +93,7 @@ const APP_HTML = `<!doctype html><html><body><h1>kcdAI</h1><script>
   await frame.evaluate(() => window.kcdHost.reveal(false));
   assert.strictEqual(await page.evaluate(() => getComputedStyle(document.getElementById('claude-header')).display), 'none');
 
-  // 4. A Claude permission dialog is lifted above kcdAI.
+  // 4. A Claude permission dialog is lifted above KCD Hukuk.
   await page.evaluate(() => {
     const d = document.createElement('div');
     d.id = 'portal';
@@ -108,7 +108,7 @@ const APP_HTML = `<!doctype html><html><body><h1>kcdAI</h1><script>
   });
   assert.ok(lifted.cls && lifted.z === '2147483600' && lifted.top, 'dialog lifted: ' + JSON.stringify(lifted));
 
-  // 5. Events from the native app reach the kcdAI frame.
+  // 5. Events from the native app reach the KCD Hukuk frame.
   await page.evaluate(() => window.__kcdShellEmit('update', { status: 'ready', version: '2.0.1' }));
   await page.waitForTimeout(100);
   const events = await frame.evaluate(() => window.__events);
@@ -129,7 +129,7 @@ const APP_HTML = `<!doctype html><html><body><h1>kcdAI</h1><script>
   //    fixed child (container-type, will-change), a header at body level, a dialog portal,
   //    and a Cloudflare check frame that must stay untouched.
   const TOP2 = `<!doctype html><html><head><title>Claude</title></head><body style="margin:0">
-    <header id="h2" style="position:sticky;top:0;height:48px;background:#eee;z-index:50">kcdAI · Chat · Share</header>
+    <header id="h2" style="position:sticky;top:0;height:48px;background:#eee;z-index:50">KCD Hukuk · Chat · Share</header>
     <main id="m2" style="container-type:inline-size;will-change:transform;height:calc(100vh - 48px)">
       <div class="wrap" style="backdrop-filter:blur(2px);height:100%"><iframe id="art2" src="https://xyz.claudemcpcontent.com/app.html" style="width:100%;height:100%;border:0"></iframe></div>
     </main>
@@ -148,7 +148,7 @@ const APP_HTML = `<!doctype html><html><body><h1>kcdAI</h1><script>
   });
   assert.deepStrictEqual(s2.rect, [0, 0, 1280, 800], 'new layout: frame fills the window ' + JSON.stringify(s2));
   assert.strictEqual(s2.header, 'none', 'new layout: body-level header hidden');
-  assert.ok(s2.topEl, 'new layout: the kcdAI frame is on top');
+  assert.ok(s2.topEl, 'new layout: the KCD Hukuk frame is on top');
   const f2 = page2.frames().find((f) => f.url().startsWith('https://xyz.claudemcpcontent.com'));
   assert.ok(await f2.evaluate(() => !!window.kcdHost && window.kcdHost.isWrapper === true), 'kcdHost on claudemcpcontent.com');
   const cf = page2.frames().find((f) => f.url().startsWith('https://challenges.cloudflare.com'));
@@ -159,13 +159,13 @@ const APP_HTML = `<!doctype html><html><body><h1>kcdAI</h1><script>
   assert.ok(d2.shown && d2.lifted, 'new layout: Claude dialog stays visible ' + JSON.stringify(d2));
   await page2.evaluate(() => window.__kcdShellReport());
   const reports = await page2.evaluate(() => window.__calls.filter((c) => c.cmd === 'kcd_save_file').map((c) => c.args.name));
-  assert.deepStrictEqual(reports, ['kcdAI-tanilama.txt'], 'diagnostic report saved');
+  assert.deepStrictEqual(reports, ['KCD-Hukuk-tanilama.txt'], 'diagnostic report saved');
 
   // 8. Claude draws its artifact page (bar included) inside its own claude.ai frame.
   const TOP3 = `<!doctype html><html><head><title>Claude</title></head><body style="margin:0">
     <iframe id="shell" src="https://claude.ai/inner/page" style="width:100%;height:100vh;border:0;display:block"></iframe></body></html>`;
   const INNER = `<!doctype html><html><head></head><body style="margin:0">
-    <header id="bar" style="height:52px;background:#ddd">kcdAI · Chat · Share</header>
+    <header id="bar" style="height:52px;background:#ddd">KCD Hukuk · Chat · Share</header>
     <div style="container-type:inline-size;height:calc(100vh - 52px)"><iframe id="art3" src="https://nest.claudemcpcontent.com/app.html" style="width:100%;height:100%;border:0"></iframe></div>
   </body></html>`;
   await context.route('https://claude.ai/artifact/nested', (r) => r.fulfill({ contentType: 'text/html', body: TOP3 }));
@@ -177,7 +177,7 @@ const APP_HTML = `<!doctype html><html><body><h1>kcdAI</h1><script>
   const inner = page3.frames().find((f) => f.url().startsWith('https://claude.ai/inner'));
   const s3 = await inner.evaluate(() => { const f = document.getElementById('art3'); const r = f.getBoundingClientRect(); return { bar: getComputedStyle(document.getElementById('bar')).display, rect: [r.left, r.top, r.width, r.height], shell: document.documentElement.classList.contains('kcd-shell') }; });
   assert.ok(s3.shell && s3.bar === 'none', 'nested: Claude bar inside the inner frame hidden ' + JSON.stringify(s3));
-  assert.deepStrictEqual(s3.rect, [0, 0, 1280, 800], 'nested: kcdAI frame fills the window');
+  assert.deepStrictEqual(s3.rect, [0, 0, 1280, 800], 'nested: KCD Hukuk frame fills the window');
   const app3 = page3.frames().find((f) => f.url().startsWith('https://nest.claudemcpcontent.com'));
   await app3.evaluate(() => window.kcdHost.reveal(true));
   await page3.waitForTimeout(200);
@@ -192,7 +192,7 @@ const APP_HTML = `<!doctype html><html><body><h1>kcdAI</h1><script>
     main{position:absolute!important;top:45px;left:0;right:0;bottom:0;display:flex} #frame-slot{position:relative;flex:1}
     #frame-content{position:absolute!important;inset:0;width:100%;height:100%;border:0}`;
   const TOP4 = `<!doctype html><html><head><link rel="stylesheet" href="/s.css"></head><body>
-    <div id="top-edge"></div><header id="hdr">kcdAI · Chat · Share</header><div id="hdr-degraded"></div>
+    <div id="top-edge"></div><header id="hdr">KCD Hukuk · Chat · Share</header><div id="hdr-degraded"></div>
     <main><div id="frame-slot"><iframe id="frame-content" src="https://bb6.frame.claudeusercontent.com/_f/1/"></iframe></div></main>
     <div class="cds-root"></div></body></html>`;
   const csp = { 'content-security-policy': "default-src 'self' https:; style-src 'self'; script-src 'self'" };
@@ -205,8 +205,8 @@ const APP_HTML = `<!doctype html><html><body><h1>kcdAI</h1><script>
   const s4 = await page4.evaluate(() => { const f = document.getElementById('frame-content'); const r = f.getBoundingClientRect(); return { hdr: getComputedStyle(document.getElementById('hdr')).display, rect: [r.left, r.top, r.width, r.height], top: document.elementFromPoint(640, 10) === f, styleBlocked: !document.getElementById('kcd-shell-base') || !document.getElementById('kcd-shell-base').sheet || document.getElementById('kcd-shell-base').sheet.cssRules.length === 0 }; });
   assert.ok(s4.styleBlocked, 'CSP: injected <style> is blocked in this test, like on Claude');
   assert.strictEqual(s4.hdr, 'none', 'CSP: Claude bar hidden despite CSP and !important ' + JSON.stringify(s4));
-  assert.deepStrictEqual(s4.rect, [0, 0, 1280, 800], 'CSP: kcdAI frame fills the window');
-  assert.ok(s4.top, 'CSP: kcdAI frame on top');
+  assert.deepStrictEqual(s4.rect, [0, 0, 1280, 800], 'CSP: KCD Hukuk frame fills the window');
+  assert.ok(s4.top, 'CSP: KCD Hukuk frame on top');
   const app4 = page4.frames().find((f) => f.url().startsWith('https://bb6.frame.claudeusercontent.com'));
   await app4.evaluate(() => window.kcdHost.reveal(true)); await page4.waitForTimeout(150);
   assert.strictEqual(await page4.evaluate(() => getComputedStyle(document.getElementById('hdr')).display), 'flex', 'CSP: reveal shows Claude again');

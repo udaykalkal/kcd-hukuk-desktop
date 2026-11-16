@@ -1,10 +1,10 @@
 /*
- * kcdAI shell bridge. Injected by the Mac and Windows apps into every frame.
+ * KCD Hukuk shell bridge. Injected by the Mac and Windows apps into every frame.
  *
- * Top frame (claude.ai): shows only the kcdAI frame, lifts Claude's own dialogs
- * above it, and forwards requests from the kcdAI frame to the native app.
+ * Top frame (claude.ai): shows only the KCD Hukuk frame, lifts Claude's own dialogs
+ * above it, and forwards requests from the KCD Hukuk frame to the native app.
  * Claude's own sub-frames (claude.ai, claudeusercontent.com): define window.kcdHost,
- * which talks to the top frame with postMessage. Other frames are left untouched. The kcdAI build uses window.kcdHost; nothing here holds client data.
+ * which talks to the top frame with postMessage. Other frames are left untouched. The KCD Hukuk build uses window.kcdHost; nothing here holds client data.
  *
  * The version and platform placeholders below are filled in by the native app.
  */
@@ -56,10 +56,10 @@
       topFrame();
     }
   } else if (/(^|\.)(claude\.ai|claude\.com|claudeusercontent\.com|claudemcpcontent\.com)$/i.test(String(location.hostname || ''))) {
-    subFrame(); // only Claude's own frames, where the kcdAI build runs; third-party frames
+    subFrame(); // only Claude's own frames, where the KCD Hukuk build runs; third-party frames
                 // (Cloudflare's browser check, payments, help widgets) are left untouched
     /* Claude may draw its artifact page (bar included) inside its own claude.ai frame:
-       hide Claude's bar there too, keeping only the kcdAI frame */
+       hide Claude's bar there too, keeping only the KCD Hukuk frame */
     if (/(^|\.)claude\.(ai|com)$/i.test(String(location.hostname || '')) && !window.__kcdShellInner) { window.__kcdShellInner = true; innerFrame(); }
   }
 
@@ -110,7 +110,7 @@
       dialogSelector: '[role="dialog"],[role="alertdialog"],[aria-modal="true"]',
       frameHint: 'claudeusercontent|claudemcpcontent'
     };
-    var current = null;      // the kcdAI iframe
+    var current = null;      // the KCD Hukuk iframe
     var revealed = false;    // Claude's full page shown on request
     var children = [];       // frames that said hello (for events)
 
@@ -278,7 +278,7 @@
       return ipc('kcd_save_file', { name: 'KCD-Hukuk-tanilama.txt', data: b64 }).then(function (path) { return ipc('kcd_show_file', { path: path }); });
     };
 
-    /* the kcdAI frame and its descendants may talk to the host */
+    /* the KCD Hukuk frame and its descendants may talk to the host */
     function fromApp(w) {
       var target = current && current.contentWindow;
       for (var i = 0; w && i < 12; i++) {
@@ -365,7 +365,7 @@
   }
 
   /* ------------------------------------------------------------------ Claude's inner frames */
-  /* Inside a claude.ai frame that holds the kcdAI frame: same rules as the top page, so
+  /* Inside a claude.ai frame that holds the KCD Hukuk frame: same rules as the top page, so
      Claude's bar drawn in this frame is hidden too. Reveal and settings follow the top page. */
   function innerFrame() {
     function R() { return document.documentElement; }
@@ -391,7 +391,7 @@
       var fr = document.querySelectorAll('iframe'), best = null, area = 0;
       for (var i = 0; i < fr.length; i++) {
         if (fr[i] === current) return current;
-        if (!hinted(fr[i])) continue; // only a kcdAI-type frame, never Claude's other frames
+        if (!hinted(fr[i])) continue; // only a KCD Hukuk-type frame, never Claude's other frames
         var r = fr[i].getBoundingClientRect(); if (r.width * r.height > area) { best = fr[i]; area = r.width * r.height; }
       }
       return best;
