@@ -1,8 +1,8 @@
-//! KCD Hukuk desktop shell (based on the kcdAI shell 2.0.5).
+//! KCD Hukuk desktop shell.
 //!
-//! A light window that opens the kcdAI build (a Claude artifact), hides Claude's own
+//! A light window that opens the KCD Hukuk build (a Claude artifact), hides Claude's own
 //! bars, and adds what a desktop app needs: downloads, notifications, links in the
-//! default browser, and updates that install themselves. Every kcdAI feature lives
+//! default browser, and updates that install themselves. Every KCD Hukuk feature lives
 //! in the build, so publishing the build updates the web, Mac and Windows apps at once.
 
 use std::{
@@ -24,8 +24,8 @@ use tauri_plugin_notification::NotificationExt;
 use tauri_plugin_opener::OpenerExt;
 use tauri_plugin_updater::{Update, UpdaterExt};
 
-/// The kcdAI build. The build itself can move this (see `kcd_set_config`).
-const DEFAULT_URL: &str = "https://claude.ai/artifact/RtpPJexjqUz8gtdwKiSr9B";
+/// The KCD Hukuk build. The build itself can move this (see `kcd_set_config`).
+const DEFAULT_URL: &str = "https://claude.ai/artifact/XxSDFy65kjkitDy8uu9GjZ";
 const HOST_JS: &str = include_str!("host.js");
 const MAIN: &str = "main";
 const UPDATE_EVERY: Duration = Duration::from_secs(6 * 60 * 60);
@@ -53,6 +53,10 @@ struct ShellConfig {
     dialog_selector: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     frame_hint: Option<String>,
+    /// The shell version that wrote this file. A saved address from another version is dropped on
+    /// start, so an update always opens the address built into that version.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    shell_version: Option<String>,
 }
 
 #[derive(Clone, Serialize)]
@@ -179,10 +183,17 @@ fn config_file<R: Runtime>(app: &AppHandle<R>) -> Option<PathBuf> {
 }
 
 fn load_config<R: Runtime>(app: &AppHandle<R>) -> ShellConfig {
-    config_file(app)
+    let mut cfg: ShellConfig = config_file(app)
         .and_then(|p| fs::read_to_string(p).ok())
         .and_then(|s| serde_json::from_str(&s).ok())
-        .unwrap_or_default()
+        .unwrap_or_default();
+    let this_version = env!("CARGO_PKG_VERSION").to_string();
+    if cfg.shell_version.as_deref() != Some(this_version.as_str()) {
+        cfg.url = None;
+        cfg.shell_version = Some(this_version);
+        let _ = save_config(app, &cfg);
+    }
+    cfg
 }
 
 fn save_config<R: Runtime>(app: &AppHandle<R>, cfg: &ShellConfig) -> Result<(), String> {
@@ -199,7 +210,7 @@ fn app_url(state: &AppState) -> String {
     state.config.lock().unwrap().url.clone().unwrap_or_else(|| DEFAULT_URL.to_string())
 }
 
-/// Only another claude.ai address may replace the kcdAI build address.
+/// Only another claude.ai address may replace the KCD Hukuk build address.
 fn valid_build_url(raw: &str) -> bool {
     url::Url::parse(raw)
         .map(|u| {

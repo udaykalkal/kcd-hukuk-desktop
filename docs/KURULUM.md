@@ -4,7 +4,7 @@ KCD Hukuk bir Claude uygulamasıdır (artifact). Masaüstü uygulaması yalnızc
 
 ## Web
 
-Herhangi bir tarayıcıdan: **[KCD Hukuk](https://claude.ai/artifact/RtpPJexjqUz8gtdwKiSr9B)** — uygulamanın sahibi olan Claude hesabıyla giriş yapın.
+Herhangi bir tarayıcıdan: **[KCD Hukuk](https://claude.ai/artifact/XxSDFy65kjkitDy8uu9GjZ)** — uygulamanın sahibi olan Claude hesabıyla giriş yapın.
 
 ## Mac
 
@@ -12,7 +12,6 @@ Herhangi bir tarayıcıdan: **[KCD Hukuk](https://claude.ai/artifact/RtpPJexjqUz
 2. Açılan pencerede KCD Hukuk simgesini **Uygulamalar** klasörüne sürükleyin.
 3. Uygulamalar'dan KCD Hukuk'u açın. İlk seferde macOS açmayabilir (uygulama Apple geliştirici hesabıyla imzalı değil): **Sistem Ayarları → Gizlilik ve Güvenlik**, sayfanın altında **Yine de Aç**, ardından **Aç**.
 
-Eski **kcdAI** uygulaması ayrı bir uygulamadır ve eski sürümü açar; isterseniz Uygulamalar'dan silebilirsiniz.
 
 ## İlk açılış
 
